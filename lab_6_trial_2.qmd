@@ -2,13 +2,15 @@
 title: "Lab 6 github"
 author: "Lily Heidger"
 format: html
-editor: visual
+editor: source
 ---
 
 ```{r}
 library(tidyr)
 library(dplyr)
 library(tidyverse)
+library(kableExtra)
+library(knitr)
 ```
 
 
@@ -73,4 +75,56 @@ The sample standard deviations are 0.289, 0.169, 0.309, 0.393.
 # sd(nectar$ppm_100)
 # sd(nectar$ppm_150)
 # sd(nectar$ppm_200)
+```
+### c. What is the mean square error?
+The mean square error is 0.0905. 
+```{r}
+nectar_aov <- aov(response ~ concentration, data = nectar_long)
+summary(nectar_aov)
+
+```
+
+### d. How many degrees of freedom are associated with error?
+16
+
+### e. Calculate the estimate of the grand mean.
+The grand mean is 0.1475
+```{r}
+sum(nectar_long$response)/20
+```
+
+### f. Calculate the group sum of squares.
+1.1344
+### g. Calculate the group degrees of freedom and the group mean square.
+3
+### h. What is F for this example?
+4.18
+### i. Find the P-value for this test?
+0.0231
+### j. Report your results in an ANOVA table.
+```{r}
+# Run ANOVA
+nectar_aov <- aov(response ~ concentration, data = nectar_long)
+aov <- summary(nectar_aov)
+
+
+
+# Example ANOVA
+fit <- aov(response ~ concentration, data = nectar_long)
+summary_fit <- summary(fit)
+
+# Extracting the summary table for the 'concentration' term
+anova_table <- summary_fit[[1]]  # Assuming the first element is the table we're interested in
+
+# Convert the extracted summary to a data frame
+anova_df <- as.data.frame(anova_table)
+
+# Now, use kable from knitr and kableExtra to create and style the table
+library(knitr)
+library(kableExtra)
+
+kable_styled <- kable(anova_df, format = "html") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+
+kable_styled
 ```
