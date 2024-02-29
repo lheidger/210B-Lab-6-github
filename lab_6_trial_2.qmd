@@ -1,0 +1,76 @@
+---
+title: "Lab 6 github"
+author: "Lily Heidger"
+format: html
+editor: visual
+---
+
+```{r}
+library(tidyr)
+library(dplyr)
+library(tidyverse)
+```
+
+
+## 1. The following anonymized data show the midterm and final exam grades (%) for eight students. The partial ANOVA table provides sum of squares and mean squares. What is the repeatability of grade performance?
+
+### a. Calculate sA2 from the mean squares and the sample size. What variance component does this quantity estimate? 
+22.1
+variability of mean across groups, used to estimate population variability
+```{r}
+grades <- data.frame(individual = c(1,2,3,4,5,6,7,8), midterm = c(78,84,94,82,58,62,81,80), final = c(81,65,75,62,60,86,92,89))
+
+anova_table <- data.frame(source = c("individual", "error", "total"), sum_of_squares = c(1145.94, 956.5, 2102.44), df = c(7,8, NA), mean_squares = c(163.71, 119.56, NA))
+
+
+
+SA2 <- (163.71 - 119.56) / 2
+```
+
+### b. Calculate the repeatability using sA2 and MSerror. 
+0.156
+```{r}
+repeata <- SA2 / (SA2 + 119.56) 
+```
+
+### c. Interpret the repeatability you just calculated. What fraction of the variance among test scores is estimated to reflect true differences among students in performance, and what fraction is measurement variance from test to test within students?
+16% of total variance is true differences in student performance
+remaining is due to test difficulty variation. 
+
+### d. What assumptions are you making when estimating repeatability to test scores?
+The assumptions are normality of the data, independent random samples, and equal variance. 
+
+## 2. Many humans like the effect of caffeine, but it occurs in plants as a deterrent to herbivory by animals. Caffeine is also found in flower nectar, and nectar is meant as a reward for pollinators, not a deterrent. How does caffeine in nectar affect visitation by pollinators? Singaravelan et al. (2005) set up feeding stations where bees were offered a choice between a control solution with 20% sucrose or a caffeinated solution with 20% sucrose plus some quantity of caffeine. Over the course of the experiment, four different concentrations of caffeine were provided: 50, 100, 150, and 200 ppm. The response variable was the difference between the amount of nectar consumed from the caffeine feeders and that removed from the control feeders at the same station (in grams). Here are the data:
+```{r}
+nectar <- data.frame(ppm_50 = c(-0.4, 0.34, 0.19, 0.05, -0.14), ppm_100 =  c(0.01, -0.39, -0.08, -0.09, -0.31), ppm_150 = c(0.65, 0.53, 0.39, -0.15, 0.46), ppm_200 = c(0.24, 0.44, 0.13, 1.03, 0.05))
+
+nectar_long <- pivot_longer(nectar, 
+                            cols = everything(), 
+                            names_to = "concentration", 
+                            values_to = "response")
+
+# Convert concentration levels to a factor
+nectar_long$concentration <- as.factor(gsub("ppm_", "", nectar_long$concentration))
+```
+
+## Does the mean amount of nectar taken depend on the concentration of caffeine in the nectar? Carry out ANOVA step by step in the following subsections:
+
+### a. State the null and alternate hypotheses appropriate to this question.
+H0: the means of all groups are the same
+HA: at least 1 mean is different
+
+### b. Calculate the following summary statistics for each group: sample size, sample mean, sample standard deviation.
+The sample size is for each group is 5. 
+The sample means are 0.008, -0.172, 0.376, and 0.378. 
+The sample standard deviations are 0.289, 0.169, 0.309, 0.393. 
+```{r}
+# mean(nectar$ppm_50)
+# mean(nectar$ppm_100)
+# mean(nectar$ppm_150)
+# mean(nectar$ppm_200)
+# 
+# sd(nectar$ppm_50)
+# sd(nectar$ppm_100)
+# sd(nectar$ppm_150)
+# sd(nectar$ppm_200)
+```
