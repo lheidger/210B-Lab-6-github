@@ -1,7 +1,11 @@
 ---
 title: "Lab 6 github"
 author: "Lily Heidger"
-format: html
+format: 
+  html:
+    embed-resources: true
+    warnings: false
+    messages: false
 editor: source
 ---
 
@@ -107,24 +111,104 @@ sum(nectar_long$response)/20
 nectar_aov <- aov(response ~ concentration, data = nectar_long)
 aov <- summary(nectar_aov)
 
-
-
-# Example ANOVA
 fit <- aov(response ~ concentration, data = nectar_long)
 summary_fit <- summary(fit)
 
-# Extracting the summary table for the 'concentration' term
 anova_table <- summary_fit[[1]]  # Assuming the first element is the table we're interested in
 
-# Convert the extracted summary to a data frame
 anova_df <- as.data.frame(anova_table)
 
-# Now, use kable from knitr and kableExtra to create and style the table
-library(knitr)
-library(kableExtra)
 
 kable_styled <- kable(anova_df, format = "html") %>%
   kable_styling(bootstrap_options = c("striped", "hover"))
 
 kable_styled
 ```
+
+
+
+
+## 3. Use the same data as the previous question, and carry out the Tukey-Kramer test to find which pairs of sample means differ from each other. Report your results in a table with the following columns: Group i label, Group j label, difference of sample means for group i and j, standard error, value of test statistic q, critical value of q, and your conclusion about the hypothesis being tested.
+Help with table???
+
+```{r}
+tukey_result <- TukeyHSD(nectar_aov)
+tukey_result
+
+means <- c(0.008, -0.172, 0.376, 0.378)
+std_devs <- c(0.289, 0.169, 0.309, 0.393)
+n <- 5  # Sample size per group
+k <- length(means)  # Number of groups
+N <- n * k  # Total number of observations
+
+MSE <- sum(std_devs^2) / k
+
+alpha <- 0.05
+df_error <- N - k
+critical_q <- qtukey(1 - alpha, k, df_error)
+critical_q
+
+#kable(data.frame(Group_i = ))
+```
+The mean of group 100 is significantly different than groups 150 and 200. 
+
+## 4. Assume that an analysis of variance is conducted for a study where there are N = 50 observations and k = 5 categories. Fill in the blanks in the following ANOVA table:
+
+### With alpha = 0.05, what is your conclusion regarding the null hypothesis that the means of
+the categories are equal?
+
+
+| Source  |  SS  |   df  |   MS   |   F   |
+|:-------:|:----:|:-----:|:------:|:-----:|
+|  Group  |      |       | 116.3  |       |
+|  Error  | 2000 |       |        |       |
+|  Total  |      |       |        |       |
+
+## 5. A study classifies 72 observations into nine groups, with eight observations in each group. The study finds that the variance among the 72 observations is 803. Complete the following ANOVA table:
+
+### What do you conclude about the hypothesis that the means of all groups are equal? Assume alpha = 0.05. What can you conclude about the P-value? 
+
+
+| Source  |  SS  |   df  |   MS   |   F   |
+|:-------:|:----:|:-----:|:------:|:-----:|
+|  Group  | 6000 |       |        |       |
+|  Error  |      |       |        |       |
+|  Total  |      |       |        |       |
+
+## 6. Use the Kruskal-Wallis test (with alpha = 0.05) to determine whether you should reject the null hypothesis that the means of the four columns of data are equal:
+Fail to reject the null in favor of the alternative that the means are the same. 
+```{r}
+data <- data.frame(
+  Col1 = c(23.1, 13.3, 15.6, 1.2),
+  Col2 = c(43.1, 10.2, 16.2, 0.2),
+  Col3 = c(56.5, 32.1, 43.3, 24.4),
+  Col4 = c(10002.3, 54.4, 8.7, 54.4)
+)
+
+data
+
+data_long <- pivot_longer(data, cols = everything(), names_to = "Group", values_to = "Value")
+
+kruskal.test(Value ~ Group, data = data_long)
+
+```
+## 7. Huey and Dunham (1987) measured the running speed of fence lizards in Big Bend National Park in Texas. Individual lizards were placed in a 2.3-meter raceway, where their running speeds were measured. Lizards were then tagged and released. The researchers returned to the park the following year, captured many of the same lizards again, and measured their sprint speed in the same way as previously. The pair of measurements for 34 individual lizards is as follows. With these data, calculate the repeatability of the running speed, and what does this metric measure?
+
+```{r}
+# Creating the data frame
+lizard_data <- data.frame(
+  LizardID = c(1:34),
+  SprintSpeed1 = c(1.43, 1.56, 1.64, 2.13, 1.96, 1.89, 1.72, 1.80, 1.87, 1.61,
+                   1.60, 1.71, 1.83, 1.92, 1.90, 2.06, 2.06, 2.28, 2.44, 2.23,
+                   2.53, 2.20, 2.16, 2.25, 2.42, 2.61, 2.62, 3.09, 2.13, 2.44,
+                   2.76, 2.96, 3.13, 3.27),
+  SprintSpeed2 = c(1.37, 1.30, 1.36, 1.54, 1.82, 1.79, 1.72, 1.80, 1.87, 1.88,
+                   1.98, 2.08, 2.16, 2.08, 2.01, 2.03, 1.97, 2.05, 1.92, 2.12,
+                   2.11, 2.22, 2.27, 2.39, 2.33, 2.33, 2.39, 2.17, 2.54, 2.63,
+                   2.69, 2.64, 2.81, 2.88)
+)
+
+head(lizard_data)
+
+```
+
