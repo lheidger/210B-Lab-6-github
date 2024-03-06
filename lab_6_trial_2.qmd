@@ -154,7 +154,7 @@ The mean of group 100 is significantly different than groups 150 and 200.
 ## 4. Assume that an analysis of variance is conducted for a study where there are N = 50 observations and k = 5 categories. Fill in the blanks in the following ANOVA table:
 
 ### With alpha = 0.05, what is your conclusion regarding the null hypothesis that the means of the categories are equal?
-
+Our F-statistic is 2.62 and our critical value is 2.579. Since F is larger than our critical value, we reject the null hypothesis in favor of the alternative that at least one group's mean is different. 
 
 | Source  |  SS  |   df  |   MS   |   F   |
 |:-------:|:----:|:-----:|:------:|:-----:|
@@ -165,13 +165,13 @@ The mean of group 100 is significantly different than groups 150 and 200.
 ## 5. A study classifies 72 observations into nine groups, with eight observations in each group. The study finds that the variance among the 72 observations is 803. Complete the following ANOVA table:
 
 ### What do you conclude about the hypothesis that the means of all groups are equal? Assume alpha = 0.05. What can you conclude about the P-value? 
-
+Our F-statistic is 0.92 and our critical value is 2.089. Since F is not larger than our critical value, we fail to reject the null hypothesis that the means are the same.
 
 | Source  |  SS  |   df  |   MS   |   F   |
 |:-------:|:----:|:-----:|:------:|:-----:|
-|  Group  | 6000 |   8   |  750   |       |
-|  Error  |      |  63   |        |       |
-|  Total  |      |  71   |        |       |
+|  Group  | 6000 |   8   |  750   | 0.92  |
+|  Error  | 51392|  63   |  815.7 |       |
+|  Total  | 57392|  71   |        |       |
 
 ## 6. Use the Kruskal-Wallis test (with alpha = 0.05) to determine whether you should reject the null hypothesis that the means of the four columns of data are equal:
 Fail to reject the null in favor of the alternative that the means are the same. 
@@ -206,7 +206,26 @@ lizard_data <- data.frame(
                    2.69, 2.64, 2.81, 2.88)
 )
 
-head(lizard_data)
+# Assuming lizard_data is your data frame
+
+# Calculate individual means
+lizard_data$mean_speed <- rowMeans(lizard_data[, c("SprintSpeed1", "SprintSpeed2")])
+
+# Calculate total variance
+total_variance <- var(c(lizard_data$SprintSpeed1, lizard_data$SprintSpeed2))
+
+# Calculate within-individual variance
+within_variance <- mean((lizard_data$SprintSpeed1 - lizard_data$mean_speed)^2 + 
+                        (lizard_data$SprintSpeed2 - lizard_data$mean_speed)^2) / 2
+
+# Calculate among-individual variance
+among_variance <- total_variance - within_variance
+
+# Calculate repeatability
+repeatability <- among_variance / total_variance
+
+# Print the repeatability
+repeatability
 
 ```
 
