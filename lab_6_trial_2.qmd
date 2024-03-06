@@ -191,6 +191,7 @@ kruskal.test(Value ~ Group, data = data_long)
 
 ```
 ## 7. Huey and Dunham (1987) measured the running speed of fence lizards in Big Bend National Park in Texas. Individual lizards were placed in a 2.3-meter raceway, where their running speeds were measured. Lizards were then tagged and released. The researchers returned to the park the following year, captured many of the same lizards again, and measured their sprint speed in the same way as previously. The pair of measurements for 34 individual lizards is as follows. With these data, calculate the repeatability of the running speed, and what does this metric measure?
+The repeatability is 0.88, a high value indicating that the data are consistent in their variance. Any large variations likely due to error or environmental variation. 
 
 ```{r}
 # Creating the data frame
@@ -206,26 +207,208 @@ lizard_data <- data.frame(
                    2.69, 2.64, 2.81, 2.88)
 )
 
-# Assuming lizard_data is your data frame
-
-# Calculate individual means
 lizard_data$mean_speed <- rowMeans(lizard_data[, c("SprintSpeed1", "SprintSpeed2")])
 
-# Calculate total variance
 total_variance <- var(c(lizard_data$SprintSpeed1, lizard_data$SprintSpeed2))
 
-# Calculate within-individual variance
 within_variance <- mean((lizard_data$SprintSpeed1 - lizard_data$mean_speed)^2 + 
                         (lizard_data$SprintSpeed2 - lizard_data$mean_speed)^2) / 2
 
-# Calculate among-individual variance
 among_variance <- total_variance - within_variance
 
-# Calculate repeatability
 repeatability <- among_variance / total_variance
-
-# Print the repeatability
 repeatability
 
 ```
+## 8. In a study of hyena laughter, or “giggling”, Mathevon et al. (2010) asked whether sound spectral properties of hyenas’ giggles are associated with age. The accompanying data show the giggle fundamental frequency (in Hz) and the age (in years) of 16 hyenas. What is the correlation coefficient in the data, and what is most-plausible range of values for the population correlation?
 
+```{r}
+hyena <- data.frame(
+  Age_years = c(2, 2, 2, 6, 9, 10, 13, 10, 14, 14, 12, 7, 11, 11, 14, 20),
+  Fundamental_frequency_Hz = c(840, 670, 580, 470, 540, 660, 510, 520, 500, 480, 400, 650, 460, 500, 580, 500)
+)
+```
+
+### a. . Plot the fundamental frequency as a function of the age. Does it suggest a positive or negative association?
+The plot suggests a negative association.
+```{r}
+ggplot(hyena, aes(x = Age_years, y = Fundamental_frequency_Hz)) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = "Age (years)", y = "Fundamental Frequency (Hz)",
+       title = "Fundamental Frequency as a Function of Age in Hyenas") +
+  geom_smooth(method = "lm", se = FALSE, color = "blue") # Adds a linear regression line without standard error
+
+```
+
+### b. Calculate the sum of squares for age.
+The sum of squares for age is 380.4375. 
+```{r}
+mean_age <- mean(hyena$Age_years)
+deviations <- hyena$Age_years - mean_age
+
+squared_deviations <- deviations^2
+
+sum_of_squares_age <- sum(squared_deviations)
+
+sum_of_squares_age
+```
+
+### c. Calculate the sum of squares for fundamental frequency.
+The sum of squares for fundamental frequency is 174175. 
+```{r}
+mean_freq <- mean(hyena$Fundamental_frequency_Hz)
+deviations <- hyena$Fundamental_frequency_Hz - mean_freq
+
+squared_deviations <- deviations^2
+
+sum_of_squares_freq <- sum(squared_deviations)
+
+sum_of_squares_freq
+```
+
+### d. Calculate the sum of products between age and frequency.
+The sum of products is 82040. 
+```{r}
+sum(hyena$Age_years * hyena$Fundamental_frequency_Hz)
+
+```
+
+### e. Compute the correlation coefficient, r.
+The correlation coefficient is -0.601798. 
+```{r}
+correlation_coefficient <- cor(hyena$Age_years, hyena$Fundamental_frequency_Hz)
+correlation_coefficient
+```
+
+### f. Compute the Fisher’s z-transformation of the correlation coefficient.
+Fischer's z-transformation is -0.6959612.
+```{r}
+r <- correlation_coefficient 
+
+z <- 0.5 * log((1 + r) / (1 - r))
+
+z
+```
+
+### g. Calculate the approximate standard error of the z-transformed correlation.
+The standard error is 0.2773501. 
+```{r}
+n <- 16
+
+SE_z <- 1 / sqrt(n - 3)
+SE_z
+```
+
+### h. What is Zcrit,the two-tailed critical value of the standard normal distribution corresponding to alpha = 0.05?
+The value of zcrit is  1.959964. 
+```{r}
+# Find the critical value for a two-tailed test with alpha = 0.05
+Z_crit <- qnorm(0.975) # You can also use 1 - (0.025) which is 0.975
+
+# Print the critical value
+Z_crit
+
+```
+
+### i. Calculate the lower and upper bounds of the 95% confidence interval for zeta, the ztransformed population correlation.
+The values are [-1.959964, 1.959964].
+```{r}
+Z_crit_lower <- qnorm(0.025)
+
+Z_crit_upper <- qnorm(0.975)
+
+Z_crit_lower
+Z_crit_upper
+
+```
+
+### j. Transform the lower and upper bounds of the confidence interval of zeta, yielding the 95% confidence interval for the population correlation coefficient.
+The values are [-0.8453293, -0.1511968]. 
+```{r}
+
+alpha <- 0.05
+Z_crit <- qnorm(1 - alpha / 2) # Two-tailed critical value
+z_L <- z - Z_crit * SE_z # Lower bound
+z_U <- z + Z_crit * SE_z # Upper bound
+
+# Transform back to get the confidence interval for r
+r_L <- (exp(2 * z_L) - 1) / (exp(2 * z_L) + 1)
+r_U <- (exp(2 * z_U) - 1) / (exp(2 * z_U) + 1)
+
+# Print the confidence interval for r
+r_L
+r_U
+
+```
+## 9. Use the same data shown in problem 1. Test whether there is a correlation in the population between giggle fundamental frequency and age.
+### a. State the null and alternative hypotheses.
+### b. Calculate the standard error of the sample correlation r.
+### c. Calculate the t-statistic.
+### d. What is the sample size? What are the degrees of freedom?
+### e. Obtain the critical value of t corresponding to alpha = 0.05.
+### f. What is the conclusion from the test?
+
+
+## 10. . As human populations become more urban from prehistory to the present, disease transmission between people likely increased. Over time, this might have led to the evolution of enhanced resistance to certain diseases in settled human populations. For example, a mutation in a human gene causes resistance to tuberculosis. Barnes et al. (2011) examined the frequency of the resistant gene in different towns and villages in Europe and Asia and compared it to how long humans had been settled in the site (“duration of settlement”). If settlement led to the evolution of greater resistance to tuberculosis, there should be a positive association between the frequency of resistant gene and the duration of settlement. The data are below. Use the Spearman’s correlation to test an association between these variables.
+
+```{r}
+gene_data <- data.frame(
+  Duration_years = c(8010, 5260, 4735, 4010, 3710, 2810, 2730, 2310, 2110, 1955,
+                     1910, 1300, 378, 194, 130, 110, 91),
+  Gene_frequency = c(0.990, 1.000, 0.948, 0.885, 0.947, 0.854, 1.000, 0.769,
+                     0.956, 0.979, 0.865, 0.922, 0.821, 0.842, 0.734, 0.766, 0.772)
+)
+
+
+
+```
+
+### a. Rank duration from low to high.
+### b. Rank gene frequency from low to high, assigning midranks to ties.
+### c. Calculate the sum of squares for the ranks of duration, gene frequency, and the sum of products.
+### d. Compute the Spearman’s correlation coefficient.
+### e. What is the sample size?
+### f. State the null and alternate hypotheses.
+### g. Obtain the critical value for the Spearman’s correlation corresponding to  = 0.05.
+### h. Draw the appropriate conclusion.
+
+## 11. . Men’s faces have higher width-to-height ratios than women’s, on average. This turns out to reflect a difference in testosterone expression. Testosterone is also known to predict aggressive behavior. Does face shape predict aggression? To test this, Carré and McCormick (2008) compared the face width-to-height ratio of 21 university hockey players with the average number of penalty minutes awarded per game for aggressive infractions like fighting or cross-checking. Their data are below. Calculate the equation for the line that best predicts penalty minutes from face width-to-height ratios.
+```{r}
+hockey_data <- data.frame(
+  Face_Width_Height = c(1.59, 1.67, 1.65, 1.72, 1.79, 1.77, 1.74, 1.74, 1.77, 1.78, 
+                        1.76, 1.81, 1.83, 1.83, 1.84, 1.87, 1.92, 1.95, 1.98, 1.99, 2.07),
+  Penalty_Minutes_Per_Game = c(0.44, 1.43, 1.57, 0.14, 0.27, 0.35, 0.85, 1.13, 1.47, 1.51, 
+                               1.99, 1.06, 1.20, 1.23, 0.80, 2.53, 1.23, 1.10, 1.61, 1.95, 2.95)
+)
+
+
+```
+
+### a. Plot the data in a scatter plot.
+### b. Examine the graph. Based on this graph, do the assumptions of linear regression appear to be met?
+### c. Calculate the means of the two variables.
+### d. How steeply does the number of penalty minutes increase per unit increase in face ratio? Calculate the estimate of the regression slope. Double check that the sign of the slope matches your impression from the scatter plot.
+### e. Calculate the estimate of the intercept from the variable means and your estimate of regression slope.
+### f. Write the result in the form of an equation for the line. Add this line to graph in part (a).
+
+
+
+## 12. How uncertain is our estimate from the previous analysis? Using the face ratio and hockey aggressive penalty data, calculate the standard error and confidence interval of the slope of the linear regression.
+### a. Calculate the total sum of squares for the response/dependent variable, penalty minutes.
+### b. Calculate the residual mean square using the total sum of square for Y, and the sum of products, and the slope b.
+### c. Calculate the standard error of b.
+### d. How many degrees of freedom does this analysis of the slope have?
+### e. Find the two-tailed critical t-value for a 95% confidence interval for the appropriate df.
+### f. Calculate the confidence interval of the population regression slope.
+
+
+
+## 13. Can the above relationship be explained by chance? Using the same data as problem 4, test the null hypothesis that the slope of the regression line is zero.
+### a. State the null and alternate hypotheses.
+### b. What is the regression slope under the null hypothesis?
+### c. Calculate the test statistic t, and the standard error of b.
+### d. Find the critical value of t appropriate for the degrees of freedom, at  = 0.05.
+### e. Is the absolute value of the t for this test greater than the critical value?
+### f. Estimate the P-value for this test, and draw conclusion from this test.
+### g. What fraction of the variation in penalty minutes per game is accounted for by face ratio? Calculate the value of R^2.
