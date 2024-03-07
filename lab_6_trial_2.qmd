@@ -341,14 +341,51 @@ r_L
 r_U
 
 ```
-## 9. Use the same data shown in problem 1. Test whether there is a correlation in the population between giggle fundamental frequency and age.
+## 9. Use the same data shown in problem 8. Test whether there is a correlation in the population between giggle fundamental frequency and age.
 ### a. State the null and alternative hypotheses.
+H0: No correlation.
+HA: Correlation between giggle fundamental frequency and age.
 ### b. Calculate the standard error of the sample correlation r.
-### c. Calculate the t-statistic.
-### d. What is the sample size? What are the degrees of freedom?
-### e. Obtain the critical value of t corresponding to alpha = 0.05.
-### f. What is the conclusion from the test?
+The standard error of the sample correlation r is 0.2134478. 
+```{r}
+hyena <- data.frame(
+  Age_years = c(2, 2, 2, 6, 9, 10, 13, 10, 14, 14, 12, 7, 11, 11, 14, 20),
+  Fundamental_frequency_Hz = c(840, 670, 580, 470, 540, 660, 510, 520, 500, 480, 400, 650, 460, 500, 580, 500)
+)
 
+r <- cor(hyena$Age_years, hyena$Fundamental_frequency_Hz)
+
+n <- nrow(hyena)
+
+SE_r <- sqrt((1 - r^2) / (n - 2))
+SE_r
+
+```
+
+### c. Calculate the t-statistic.
+The t-statistic is -2.819416. 
+```{r}
+r * sqrt((n - 2) / (1 - r^2))
+
+```
+
+### d. What is the sample size? What are the degrees of freedom?
+Sample size is 16, df is 14.
+
+### e. Obtain the critical value of t corresponding to alpha = 0.05.
+2.144787
+```{r}
+df <- 16 - 2
+
+alpha <- 0.05
+t_critical <- qt(1 - alpha/2, df)
+
+t_critical
+
+```
+
+### f. What is the conclusion from the test?
+Fail to reject the null. 
 
 ## 10. . As human populations become more urban from prehistory to the present, disease transmission between people likely increased. Over time, this might have led to the evolution of enhanced resistance to certain diseases in settled human populations. For example, a mutation in a human gene causes resistance to tuberculosis. Barnes et al. (2011) examined the frequency of the resistant gene in different towns and villages in Europe and Asia and compared it to how long humans had been settled in the site (“duration of settlement”). If settlement led to the evolution of greater resistance to tuberculosis, there should be a positive association between the frequency of resistant gene and the duration of settlement. The data are below. Use the Spearman’s correlation to test an association between these variables.
 
@@ -359,19 +396,59 @@ gene_data <- data.frame(
   Gene_frequency = c(0.990, 1.000, 0.948, 0.885, 0.947, 0.854, 1.000, 0.769,
                      0.956, 0.979, 0.865, 0.922, 0.821, 0.842, 0.734, 0.766, 0.772)
 )
-
-
-
 ```
 
 ### a. Rank duration from low to high.
+```{r}
+gene_data_sorted <- gene_data[order(gene_data$Duration_years), ]
+
+print(gene_data_sorted)
+```
+
 ### b. Rank gene frequency from low to high, assigning midranks to ties.
+```{r}
+gene_data$Gene_frequency_rank <- rank(gene_data$Gene_frequency)
+
+print(gene_data)
+```
+
 ### c. Calculate the sum of squares for the ranks of duration, gene frequency, and the sum of products.
+408, 407.5, 291.5
+```{r}
+gene_data$Rank_Duration <- rank(gene_data$Duration_years)
+gene_data$Rank_Gene_Frequency <- rank(gene_data$Gene_frequency)
+
+# Calculate sum of squares for the ranks
+SS_Rank_Duration <- sum((gene_data$Rank_Duration - mean(gene_data$Rank_Duration))^2)
+SS_Rank_Gene_Frequency <- sum((gene_data$Rank_Gene_Frequency - mean(gene_data$Rank_Gene_Frequency))^2)
+
+# Calculate sum of products for the ranks
+SP_Ranks <- sum((gene_data$Rank_Duration - mean(gene_data$Rank_Duration)) * (gene_data$Rank_Gene_Frequency - mean(gene_data$Rank_Gene_Frequency)))
+
+# Print the results
+SS_Rank_Duration
+SS_Rank_Gene_Frequency
+SP_Ranks
+
+```
+
 ### d. Compute the Spearman’s correlation coefficient.
+0.714899
+```{r}
+cor(gene_data$Duration_years, gene_data$Gene_frequency, method = "spearman")
+
+```
+
 ### e. What is the sample size?
+17
 ### f. State the null and alternate hypotheses.
-### g. Obtain the critical value for the Spearman’s correlation corresponding to  = 0.05.
+H0: No correlation .
+HA: Correlation between frequency of resistant gene and the duration of settlement. 
+### g. Obtain the critical value for the Spearman’s correlation corresponding to alpha = 0.05.
+0.485
+
 ### h. Draw the appropriate conclusion.
+Reject the null.
 
 ## 11. . Men’s faces have higher width-to-height ratios than women’s, on average. This turns out to reflect a difference in testosterone expression. Testosterone is also known to predict aggressive behavior. Does face shape predict aggression? To test this, Carré and McCormick (2008) compared the face width-to-height ratio of 21 university hockey players with the average number of penalty minutes awarded per game for aggressive infractions like fighting or cross-checking. Their data are below. Calculate the equation for the line that best predicts penalty minutes from face width-to-height ratios.
 ```{r}
@@ -381,16 +458,58 @@ hockey_data <- data.frame(
   Penalty_Minutes_Per_Game = c(0.44, 1.43, 1.57, 0.14, 0.27, 0.35, 0.85, 1.13, 1.47, 1.51, 
                                1.99, 1.06, 1.20, 1.23, 0.80, 2.53, 1.23, 1.10, 1.61, 1.95, 2.95)
 )
-
-
 ```
 
 ### a. Plot the data in a scatter plot.
+```{r}
+ggplot(hockey_data, aes(x = Face_Width_Height, y = Penalty_Minutes_Per_Game)) +
+  geom_point() + 
+  labs(x = "Face Width/Height", y = "Penalty Minutes Per Game", 
+       title = "Scatter Plot of Hockey Data") +
+  theme_minimal()
+```
+
 ### b. Examine the graph. Based on this graph, do the assumptions of linear regression appear to be met?
+Yes
 ### c. Calculate the means of the two variables.
+1.812857, 1.276667
+```{r}
+mean(hockey_data$Face_Width_Height)
+mean(hockey_data$Penalty_Minutes_Per_Game)
+```
+
 ### d. How steeply does the number of penalty minutes increase per unit increase in face ratio? Calculate the estimate of the regression slope. Double check that the sign of the slope matches your impression from the scatter plot.
+3.188983 
+```{r}
+model <- lm(Penalty_Minutes_Per_Game ~ Face_Width_Height, data = hockey_data)
+
+slope_estimate <- coef(model)["Face_Width_Height"]
+
+slope_estimate
+```
+
 ### e. Calculate the estimate of the intercept from the variable means and your estimate of regression slope.
+-4.504503 
+```{r}
+mean_X <- mean(hockey_data$Face_Width_Height)
+mean_Y <- mean(hockey_data$Penalty_Minutes_Per_Game)
+
+intercept_estimate <- mean_Y - slope_estimate * mean_X
+
+intercept_estimate
+
+```
+
 ### f. Write the result in the form of an equation for the line. Add this line to graph in part (a).
+Y= -4.5+3.19X
+```{r}
+plot(hockey_data$Face_Width_Height, hockey_data$Penalty_Minutes_Per_Game, 
+     xlab = "Face Width/Height", ylab = "Penalty Minutes Per Game", 
+     main = "Scatter Plot with Regression Line", pch = 19)
+
+abline(intercept_estimate, slope_estimate, col = "blue")
+
+```
 
 
 
