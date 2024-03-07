@@ -100,7 +100,7 @@ sum(nectar_long$response)/20
 ### f. Calculate the group sum of squares.
 1.1344
 ### g. Calculate the group degrees of freedom and the group mean square.
-3
+3, ??
 ### h. What is F for this example?
 4.18
 ### i. Find the P-value for this test?
@@ -268,9 +268,9 @@ sum_of_squares_freq
 ```
 
 ### d. Calculate the sum of products between age and frequency.
-The sum of products is 82040. 
+The sum of products is -4898. 
 ```{r}
-sum(hyena$Age_years * hyena$Fundamental_frequency_Hz)
+#sum(hyena$Age_years * hyena$Fundamental_frequency_Hz)
 
 ```
 
@@ -312,7 +312,7 @@ Z_crit
 ```
 
 ### i. Calculate the lower and upper bounds of the 95% confidence interval for zeta, the ztransformed population correlation.
-The values are [-1.959964, 1.959964].
+The values are [-1.959964, 1.959964].??
 ```{r}
 Z_crit_lower <- qnorm(0.025)
 
