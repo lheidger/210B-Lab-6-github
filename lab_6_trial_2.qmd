@@ -515,10 +515,57 @@ abline(intercept_estimate, slope_estimate, col = "blue")
 
 ## 12. How uncertain is our estimate from the previous analysis? Using the face ratio and hockey aggressive penalty data, calculate the standard error and confidence interval of the slope of the linear regression.
 ### a. Calculate the total sum of squares for the response/dependent variable, penalty minutes.
+10.02887
+```{r}
+mean_penalty_minutes <- mean(hockey_data$Penalty_Minutes_Per_Game)
+SST <- sum((hockey_data$Penalty_Minutes_Per_Game - mean_penalty_minutes)^2)
+SST
+
+```
+
 ### b. Calculate the residual mean square using the total sum of square for Y, and the sum of products, and the slope b.
+0.3756553
+```{r}
+mean_X <- mean(hockey_data$Face_Width_Height)
+mean_Y <- mean(hockey_data$Penalty_Minutes_Per_Game)
+
+SP <- sum((hockey_data$Face_Width_Height - mean_X) * (hockey_data$Penalty_Minutes_Per_Game - mean_Y))
+b <- 3.19
+n <- length(hockey_data$Penalty_Minutes_Per_Game) # Number of observations
+
+# Calculate the Residual Sum of Squares (RSS)
+RSS <- SST - b * SP
+
+# Calculate the Residual Mean Square (RMS or MSE)
+RMS <- RSS / (n - 2)
+
+# Print the Residual Mean Square
+RMS
+
+```
+
 ### c. Calculate the standard error of b.
+1.149712
+```{r}
+model <- lm(Penalty_Minutes_Per_Game ~ Face_Width_Height, data = hockey_data)
+
+SE_b <- summary(model)$coefficients[2, 2]  
+SE_b
+```
+
 ### d. How many degrees of freedom does this analysis of the slope have?
+19
 ### e. Find the two-tailed critical t-value for a 95% confidence interval for the appropriate df.
+2.093024
+```{r}
+df <- 19
+
+alpha <- 0.05
+t_critical <- qt(1 - alpha/2, df)
+t_critical
+
+```
+
 ### f. Calculate the confidence interval of the population regression slope.
 
 
