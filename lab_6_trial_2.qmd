@@ -55,7 +55,6 @@ nectar_long <- pivot_longer(nectar,
                             names_to = "concentration", 
                             values_to = "response")
 
-# Convert concentration levels to a factor
 nectar_long$concentration <- as.factor(gsub("ppm_", "", nectar_long$concentration))
 ```
 
@@ -100,11 +99,12 @@ sum(nectar_long$response)/20
 ### f. Calculate the group sum of squares.
 1.1344
 ### g. Calculate the group degrees of freedom and the group mean square.
-3, ??
+df: 3, 
+MSgroups: 0.3781
 ### h. What is F for this example?
-4.18
+F: 4.18
 ### i. Find the P-value for this test?
-0.0231
+P-value: 0.0231
 ### j. Report your results in an ANOVA table.
 ```{r}
 # Run ANOVA
@@ -114,7 +114,7 @@ aov <- summary(nectar_aov)
 fit <- aov(response ~ concentration, data = nectar_long)
 summary_fit <- summary(fit)
 
-anova_table <- summary_fit[[1]]  # Assuming the first element is the table we're interested in
+anova_table <- summary_fit[[1]]  
 
 anova_df <- as.data.frame(anova_table)
 
@@ -237,7 +237,7 @@ ggplot(hyena, aes(x = Age_years, y = Fundamental_frequency_Hz)) +
   theme_minimal() +
   labs(x = "Age (years)", y = "Fundamental Frequency (Hz)",
        title = "Fundamental Frequency as a Function of Age in Hyenas") +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") # Adds a linear regression line without standard error
+  geom_smooth(method = "lm", se = FALSE, color = "blue") 
 
 ```
 
@@ -303,23 +303,25 @@ SE_z
 ### h. What is Zcrit,the two-tailed critical value of the standard normal distribution corresponding to alpha = 0.05?
 The value of zcrit is  1.959964. 
 ```{r}
-# Find the critical value for a two-tailed test with alpha = 0.05
-Z_crit <- qnorm(0.975) # You can also use 1 - (0.025) which is 0.975
+Z_crit <- qnorm(0.975) 
 
-# Print the critical value
 Z_crit
 
 ```
 
 ### i. Calculate the lower and upper bounds of the 95% confidence interval for zeta, the ztransformed population correlation.
-The values are [-1.959964, 1.959964].??
+The values are [-1.239557, -0.152365].??
 ```{r}
-Z_crit_lower <- qnorm(0.025)
+z <- -0.6959612
+n <- nrow(hyena)
 
-Z_crit_upper <- qnorm(0.975)
+CI_lower <- z - (Z_crit * SE_z)
+CI_upper <- z + (Z_crit * SE_z)
 
-Z_crit_lower
-Z_crit_upper
+# Print the confidence interval
+CI_lower
+CI_upper
+
 
 ```
 
@@ -332,11 +334,9 @@ Z_crit <- qnorm(1 - alpha / 2) # Two-tailed critical value
 z_L <- z - Z_crit * SE_z # Lower bound
 z_U <- z + Z_crit * SE_z # Upper bound
 
-# Transform back to get the confidence interval for r
 r_L <- (exp(2 * z_L) - 1) / (exp(2 * z_L) + 1)
 r_U <- (exp(2 * z_U) - 1) / (exp(2 * z_U) + 1)
 
-# Print the confidence interval for r
 r_L
 r_U
 
@@ -418,11 +418,9 @@ print(gene_data)
 gene_data$Rank_Duration <- rank(gene_data$Duration_years)
 gene_data$Rank_Gene_Frequency <- rank(gene_data$Gene_frequency)
 
-# Calculate sum of squares for the ranks
 SS_Rank_Duration <- sum((gene_data$Rank_Duration - mean(gene_data$Rank_Duration))^2)
 SS_Rank_Gene_Frequency <- sum((gene_data$Rank_Gene_Frequency - mean(gene_data$Rank_Gene_Frequency))^2)
 
-# Calculate sum of products for the ranks
 SP_Ranks <- sum((gene_data$Rank_Duration - mean(gene_data$Rank_Duration)) * (gene_data$Rank_Gene_Frequency - mean(gene_data$Rank_Gene_Frequency)))
 
 # Print the results
@@ -531,15 +529,11 @@ mean_Y <- mean(hockey_data$Penalty_Minutes_Per_Game)
 
 SP <- sum((hockey_data$Face_Width_Height - mean_X) * (hockey_data$Penalty_Minutes_Per_Game - mean_Y))
 b <- 3.19
-n <- length(hockey_data$Penalty_Minutes_Per_Game) # Number of observations
+n <- length(hockey_data$Penalty_Minutes_Per_Game) 
 
-# Calculate the Residual Sum of Squares (RSS)
 RSS <- SST - b * SP
 
-# Calculate the Residual Mean Square (RMS or MSE)
 RMS <- RSS / (n - 2)
-
-# Print the Residual Mean Square
 RMS
 
 ```
@@ -567,14 +561,65 @@ t_critical
 ```
 
 ### f. Calculate the confidence interval of the population regression slope.
+[0.7826085, 5.595357]
+```{r}
+b <- coef(model)["Face_Width_Height"]
+SE_b <- summary(model)$coefficients[2, 2] 
+df <- nrow(hockey_data) - 2 
+alpha <- 0.05
+
+t_critical <- qt(1 - alpha/2, df)
+
+CI_lower <- b - t_critical * SE_b
+CI_upper <- b + t_critical * SE_b
+
+CI_lower
+CI_upper
+
+```
 
 
 
 ## 13. Can the above relationship be explained by chance? Using the same data as problem 4, test the null hypothesis that the slope of the regression line is zero.
 ### a. State the null and alternate hypotheses.
+H0: no linear relationship
+HA: linear relationship
 ### b. What is the regression slope under the null hypothesis?
+The regression slope under the null hypothesis is 0. 
 ### c. Calculate the test statistic t, and the standard error of b.
-### d. Find the critical value of t appropriate for the degrees of freedom, at  = 0.05.
+1.149712, 2.773724 
+```{r}
+model <- lm(Penalty_Minutes_Per_Game ~ Face_Width_Height, data = hockey_data)
+SE_b <- summary(model)$coefficients["Face_Width_Height", "Std. Error"]
+
+b <- coef(model)["Face_Width_Height"] 
+t <- b / SE_b 
+
+SE_b
+t
+
+```
+
+### d. Find the critical value of t appropriate for the degrees of freedom, at alpha = 0.05.
+The critcal value is 2.093024. 
+```{r}
+n <- length(hockey_data$Face_Width_Height) 
+df <- n - 2
+
+alpha <- 0.05
+t_critical <- qt(1 - alpha/2, df)
+t_critical
+
+```
+
 ### e. Is the absolute value of the t for this test greater than the critical value?
+Yes
 ### f. Estimate the P-value for this test, and draw conclusion from this test.
+A p-value of 0.0121 is less than our alpha of 0.05,  indicating that we should reject the null in favor of the alternative that there is a linear relationship. 
+```{r}
+model <- lm(Penalty_Minutes_Per_Game ~ Face_Width_Height, data = hockey_data)
+summary(model)
+```
+
 ### g. What fraction of the variation in penalty minutes per game is accounted for by face ratio? Calculate the value of R^2.
+The value of R^2 is 0.2882, indicating that ~29% of the variation is accounted for by face ratio. 
